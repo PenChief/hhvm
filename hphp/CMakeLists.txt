@@ -51,7 +51,7 @@ add_subdirectory(system)
 add_subdirectory(hhvm)
 
 if (NOT "$ENV{HPHP_NOTEST}" STREQUAL "1")
-	add_subdirectory(test)
+##    add_subdirectory(test)
 endif ()
 
 # Keep this last
