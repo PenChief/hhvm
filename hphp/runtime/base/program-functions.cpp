@@ -75,6 +75,7 @@
 #include "hphp/runtime/vm/jit/arch.h"
 #include "hphp/runtime/vm/jit/translator.h"
 #include "hphp/compiler/builtin_symbols.h"
+#include "hphp/runtime/monitor/monitor.h"
 
 using namespace boost::program_options;
 using std::cout;
@@ -1538,6 +1539,7 @@ static void handle_exception(bool& ret, ExecutionContext* context,
                              bool& error, bool richErrorMsg) {
   assert(where == ContextOfException::Invoke ||
          where == ContextOfException::ReqInit);
+
   try {
     handle_exception_helper(ret, context, errorMsg, where, error, richErrorMsg);
   } catch (const ExitException &e) {

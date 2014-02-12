@@ -44,6 +44,7 @@
 #include "hphp/runtime/vm/jit/translator.h"
 #include "hphp/runtime/vm/debugger-hook.h"
 #include "hphp/runtime/vm/event-hook.h"
+#include "hphp/runtime/monitor/monitor.h"
 
 namespace HPHP {
 ///////////////////////////////////////////////////////////////////////////////
@@ -850,6 +851,7 @@ void BaseExecutionContext::recordLastError(const Exception &e,
 }
 
 bool BaseExecutionContext::onFatalError(const Exception &e) {
+  ZendMonitor::onFatalError( &e );
   int errnum = static_cast<int>(ErrorConstants::ErrorModes::FATAL_ERROR);
   recordLastError(e, errnum);
   String file = empty_string;

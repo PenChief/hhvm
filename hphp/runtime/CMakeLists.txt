@@ -1,4 +1,4 @@
-set(RECURSIVE_SOURCE_SUBDIRS base debugger eval ext server vm)
+set(RECURSIVE_SOURCE_SUBDIRS base debugger eval ext server vm monitor)
 foreach (dir ${RECURSIVE_SOURCE_SUBDIRS})
 	HHVM_SELECT_SOURCES("${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
 endforeach(dir ${RECURSIVE_SOURCE_SUBDIRS})
@@ -30,6 +30,7 @@ if(NOT HAVE_CUSTOM_LIBEVENT)
 endif()
 
 include_directories("${HPHP_HOME}/hphp/third_party")
+include_directories("${ZS_SRC_DIR}/ZendEventsReporter/src")
 
 ADD_LIBRARY(hphp_runtime_static STATIC
             ${CXX_SOURCES} ${C_SOURCES} ${ASM_SOURCES})
@@ -38,6 +39,8 @@ SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES PREFIX "lib")
 SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 SET(CMAKE_CXX_ARCHIVE_APPEND "<CMAKE_AR> q <TARGET> <LINK_FLAGS> <OBJECTS>")
+
+message("-- Including Monitor directory")
 
 hphp_link(hphp_runtime_static)
 add_dependencies(hphp_runtime_static hphp_parser)

@@ -1,6 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7 FATAL_ERROR)
 PROJECT(hphp C CXX ASM)
 
+## Zend Server event reporting mechanism
+if ( NOT DEFINED ENV{ZS_SRC_DIR} )
+  message(FATAL_ERROR "ERROR! please set ZS_SRC_DIR environment variable to point to Zend Server build folder")
+endif ( )
+set ( ZS_SRC_DIR $ENV{ZS_SRC_DIR} )
+message("-- ZS_SRC_DIR is set to ${ZS_SRC_DIR}")
+
 IF(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 	message(FATAL_ERROR "HHVM requires a 64bit OS")
 ENDIF()

@@ -1,0 +1,3 @@
+DynamicExtensions {
+  monitor = /home/eran/devl/facebook/hhvm/MonitorExtension/src/monitor.so
+}
