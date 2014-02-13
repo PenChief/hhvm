@@ -32,16 +32,8 @@ endif()
 include_directories("${HPHP_HOME}/hphp/third_party")
 include_directories("${ZS_SRC_DIR}/ZendEventsReporter/src")
 
-if ( HHVM_SHARED_RUNTIME )
-  message("-- hphp_runtime_static is built as SHARED library ")
-  ADD_LIBRARY(hphp_runtime_static SHARED
-              ${CXX_SOURCES} ${C_SOURCES} ${ASM_SOURCES})
-else ( HHVM_SHARED_RUNTIME )
-
-  message("-- hphp_runtime_static is built as STATIC library ")
-  ADD_LIBRARY(hphp_runtime_static STATIC
-              ${CXX_SOURCES} ${C_SOURCES} ${ASM_SOURCES})
-endif ( HHVM_SHARED_RUNTIME )
+ADD_LIBRARY(hphp_runtime_static STATIC
+            ${CXX_SOURCES} ${C_SOURCES} ${ASM_SOURCES})
 
 SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES OUTPUT_NAME "hphp_runtime")
 SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES PREFIX "lib")

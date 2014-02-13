@@ -21,12 +21,6 @@ include(ExtZendCompat)
 
 add_definitions("-DHHVM")
 
-## Add globally the -fPIC flag
-if ( HHVM_SHARED_RUNTIME )
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif ( HHVM_SHARED_RUNTIME )
-
 add_subdirectory(tools/bootstrap)
 
 add_subdirectory(third_party/libafdt)

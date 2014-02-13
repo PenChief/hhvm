@@ -6,15 +6,6 @@ if ( NOT DEFINED ENV{ZS_SRC_DIR} )
   message(FATAL_ERROR "**** ERROR! please set ZS_SRC_DIR environment variable to point to Zend Server build folder")
 endif ( )
 
-## Should we build HHVM Runtime as shared library?
-if ( HHVM_SHARED_RUNTIME )
-  message("-- HHVM runtime is built as SHARED library" )
-  add_definitions(-DHHVM_RUNTIME_SHARED=1)
-else ( HHVM_SHARED_RUNTIME )
-  message("-- HHVM runtime is built as STATIC library" )
-  add_definitions(-DHHVM_RUNTIME_SHARED=0)
-endif ( HHVM_SHARED_RUNTIME )
-
 set ( ZS_SRC_DIR $ENV{ZS_SRC_DIR} )
 message("-- ZS_SRC_DIR is set to ${ZS_SRC_DIR}")
 
