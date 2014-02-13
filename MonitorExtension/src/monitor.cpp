@@ -84,7 +84,8 @@ public:
     // HHVM_FE(hw_print);
     loadSystemlib();
     EventHook::Enable();
-
+    fprintf(stderr, "Zend Monitor Extension loaded\n");
+    
     // Initialize Zend event reporting
     Zend::InitializeReporting();
     ZendMonitor::setFatalErrorHandler( &monitorExtension::onFatalError );

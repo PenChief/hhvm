@@ -1,0 +1,11 @@
+Server {
+    IP = 0.0.0.0
+    Port = 8080
+    SourceRoot = /var/www/hhvm
+}
+
+DynamicExtensions {
+  monitor = /home/eran/devl/facebook/hhvm/MonitorExtension/src/monitor.so
+}
+
+
