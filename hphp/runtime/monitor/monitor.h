@@ -6,28 +6,28 @@
 #include "hphp/runtime/base/rds.h"
 #include "hphp/runtime/base/exceptions.h"
 #include <atomic>
-#include <ExternalEventsRporter.h>
 
 namespace HPHP
 {
 class ZendMonitor
 {
+public:
+  typedef void (*PFUNC_ERROR_HANDLER)(const HPHP::Exception* exc);
+  
 protected:
-  /**
-   * @brief extract backtrace usable by zend server from HHVM extended exception class
-   */
-  static void extractBacktraceFromExpcetion(const HPHP::ExtendedException& exc, Zend::BacktraceList_t& bt) ;
-
-  /**
-   * @brief extract the function name from ActRec & funcType
-   */
-  static const char* getFunctionName(const HPHP::ActRec* ar, int funcType) ;
+  static PFUNC_ERROR_HANDLER m_pfnFatalError;
+  
 
 public:
   /**
    * @brief callback function will called by HHVM when a fatal error occurs
    */
   static void onFatalError(const HPHP::Exception* exc) ;
+  
+  /**
+   * @brief set a user error handler function
+   */
+  static void setFatalErrorHandler(PFUNC_ERROR_HANDLER pfn);
 };
 
 }

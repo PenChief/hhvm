@@ -32,7 +32,7 @@ endif()
 include_directories("${HPHP_HOME}/hphp/third_party")
 include_directories("${ZS_SRC_DIR}/ZendEventsReporter/src")
 
-ADD_LIBRARY(hphp_runtime_static STATIC
+ADD_LIBRARY(hphp_runtime_static SHARED
             ${CXX_SOURCES} ${C_SOURCES} ${ASM_SOURCES})
 SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES OUTPUT_NAME "hphp_runtime")
 SET_TARGET_PROPERTIES(hphp_runtime_static PROPERTIES PREFIX "lib")

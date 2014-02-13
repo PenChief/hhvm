@@ -12,3 +12,6 @@ embed_all_systemlibs(hhvm "${CMAKE_CURRENT_SOURCE_DIR}/hhvm")
 add_dependencies(hhvm systemlib)
 
 HHVM_INSTALL(hhvm bin)
+
+## install libphp_runtime.so -> ${CMAKE_INSTALL_PREFIX}/lib (defaults to /usr/local/lib)
+HHVM_INSTALL(libphp_runtime lib) 

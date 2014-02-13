@@ -21,6 +21,10 @@ include(ExtZendCompat)
 
 add_definitions("-DHHVM")
 
+## Add globallu the -fPIC flag
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
 add_subdirectory(tools/bootstrap)
 
 add_subdirectory(third_party/libafdt)
