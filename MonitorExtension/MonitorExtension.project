@@ -39,7 +39,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="/home/eran/devl/facebook/hhvm/hphp/hhvm/hhvm" CommandArguments="-c myconf.hdf hhvm.php" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="/home/eran/devl/facebook/hhvm/MonitorExtension/src" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="/usr/local/bin/hhvm" CommandArguments="-m server -c server.hdf" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="/home/eran/devl/facebook/hhvm/MonitorExtension/src" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[HPHP_HOME=/home/eran/devl/facebook/hhvm/]]>
       </Environment>
