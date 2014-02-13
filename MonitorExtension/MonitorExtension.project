@@ -21,7 +21,6 @@
     <File Name="src/monitor.php"/>
     <File Name="src/monitor.cpp"/>
     <File Name="src/config.cmake"/>
-    <File Name="src/CMakeLists.txt"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

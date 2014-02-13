@@ -95,7 +95,7 @@ public:
     // Perform Request Init
   }
   virtual void requestShutdown() {
-    Zend::SendEvents(g_vmContext->getRequestUrl(), g_vmContext->getContainingFileName().data());
+    Zend::SendEvents(g_vmContext->getRequestUrl(), "");
   }
 
   /**

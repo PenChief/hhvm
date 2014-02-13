@@ -16,33 +16,68 @@ if (LIBDWARF_LIBRARIES AND LIBDWARF_INCLUDE_DIRS)
   set (LibDwarf_FIND_QUIETLY TRUE)
 endif (LIBDWARF_LIBRARIES AND LIBDWARF_INCLUDE_DIRS)
 
-find_path (DWARF_INCLUDE_DIR
+if ( HHVM_SHARED_RUNTIME )
+  find_path (DWARF_INCLUDE_DIR
+      NAMES
+        libdwarf.h dwarf.h
+      PATHS
+        /home/eran/root/include
+        /usr/include
+        /usr/include/libdwarf
+        /opt/local/include
+        /sw/include
+        ENV CPATH) # PATH and INCLUDE will also work
+      
+else ( HHVM_SHARED_RUNTIME )
+
+  ## When building as static library 
+  ## use the default search path
+  find_path (DWARF_INCLUDE_DIR
     NAMES
       libdwarf.h dwarf.h
     PATHS
-      /usr/local/include
       /usr/include
       /usr/include/libdwarf
+      /usr/local/include
       /opt/local/include
       /sw/include
       ENV CPATH) # PATH and INCLUDE will also work
+      
+endif ( HHVM_SHARED_RUNTIME )
 
 if (DWARF_INCLUDE_DIR)
     set (LIBDWARF_INCLUDE_DIRS  ${DWARF_INCLUDE_DIR})
 endif ()
 
-find_library (LIBDWARF_LIBRARIES
-    NAMES
-      dwarf
-    PATHS
-      /usr/local/lib
-      /usr/lib
-      /opt/local/lib
-      /sw/lib
-      ENV LIBRARY_PATH   # PATH and LIB will also work
-      ENV LD_LIBRARY_PATH)
-include (FindPackageHandleStandardArgs)
-
+if ( HHVM_SHARED_RUNTIME )
+  message("-- Using SHARED runtime, searching /usr/local/lib first")
+  find_library (LIBDWARF_LIBRARIES
+      NAMES
+        dwarf
+      PATHS
+        /home/eran/root/lib
+        /usr/lib
+        /opt/local/lib
+        /sw/lib
+        ENV LIBRARY_PATH   # PATH and LIB will also work
+        ENV LD_LIBRARY_PATH)
+  include (FindPackageHandleStandardArgs)
+  
+else ( HHVM_SHARED_RUNTIME )
+  message("-- Using STATIC runtime ")
+  find_library (LIBDWARF_LIBRARIES
+      NAMES
+        dwarf
+      PATHS
+        /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
+        ENV LIBRARY_PATH   # PATH and LIB will also work
+        ENV LD_LIBRARY_PATH)
+  include (FindPackageHandleStandardArgs)
+  
+endif ( HHVM_SHARED_RUNTIME )
 
 # handle the QUIETLY and REQUIRED arguments and set LIBDWARF_FOUND to TRUE
 # if all listed variables are TRUE
