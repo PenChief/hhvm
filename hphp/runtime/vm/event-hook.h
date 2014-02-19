@@ -20,6 +20,7 @@
 #include "hphp/runtime/base/execution-context.h"
 #include "hphp/runtime/vm/bytecode.h"
 #include "hphp/runtime/base/rds.h"
+#include "hphp/runtime/monitor/monitor.h"
 
 #include <atomic>
 
@@ -53,6 +54,7 @@ class EventHook {
    */
   static bool onFunctionEnter(const ActRec* ar, int funcType);
   static inline bool FunctionEnter(const ActRec* ar, int funcType) {
+    ZendMonitor::onFunctionEnter( ar, NormalFunc );
     if (Trace::moduleEnabled(Trace::ringbuffer, 1)) {
       auto name = ar->m_func->fullName();
       Trace::ringbufferMsg(name->data(), name->size(), Trace::RBTypeFuncEntry);
@@ -73,6 +75,7 @@ class EventHook {
    */
   static void onFunctionExit(const ActRec* ar);
   static inline void FunctionExit(const ActRec* ar) {
+    ZendMonitor::onFunctionExit( ar, NormalFunc );
     if (Trace::moduleEnabled(Trace::ringbuffer, 1)) {
       auto name = ar->m_func->fullName();
       Trace::ringbufferMsg(name->data(), name->size(), Trace::RBTypeFuncExit);

@@ -99,7 +99,7 @@ static char **debugger_completion(const char *text, int start, int end) {
   TRACE(2, "DebuggerClient::debugger_completion\n");
   if (getStaticDebuggerClient().setCompletion(text, start, end)) {
     return rl_completion_matches((char*)text, &debugger_generator);
-  }
+  } 
   return nullptr;
 }
 

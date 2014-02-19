@@ -4,7 +4,7 @@ endif ()
 set( ZS_SRC_DIR $ENV{ZS_SRC_DIR} )
 include_directories( ${ZS_SRC_DIR}/ZendEventsReporter/src )
 
-HHVM_EXTENSION(monitor monitor.cpp)
+HHVM_EXTENSION(monitor ZendTraceCollector.cpp monitor.cpp)
 HHVM_SYSTEMLIB(monitor monitor.php)
 target_link_libraries( monitor ${ZS_SRC_DIR}/ZendEventsReporter/src/libLibZendEventsReporter.so)
 

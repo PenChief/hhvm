@@ -3,6 +3,9 @@
 #include <hphp/runtime/vm/event-hook.h>
 #include "ExternalEventsRporter.h"
 #include "hphp/runtime/monitor/monitor.h"
+#include "ZendTraceCollector.h"
+#include "hphp/runtime/base/class-info.h"
+#include <iostream>
 
 namespace HPHP
 {
@@ -17,8 +20,9 @@ const StaticString
 class monitorExtension : public Extension
 {
 protected:
+  static ZendTraceCollector m_collector;
   
-
+protected:
   /**
    * @brief return the current function name from the FP 
    */
@@ -30,7 +34,7 @@ protected:
       if (name[0] == '\0') {
         // We're evaling some code for internal purposes, most
         // likely getting the default value for a function parameter
-        name = "{internal}";
+        name = "{main}";
       }
       break;
     case EventHook::PseudoMain:
@@ -46,7 +50,40 @@ protected:
     }
     return name;
   }
+  
+  /**
+   * @brief return file,line pair from activation record
+   */
+  static void getZendFunctionInfo(const HPHP::ActRec* ar, int funcType, ZendFunctionInfo &zfi) {
+    
+    ClassInfo::MethodInfo info;
+    ar->m_func->getFuncInfo( &info );
+    zfi.m_linenumber = info.line1; // line1: start of function, line2: end of function
+    
+    // parepare the arguments field
+    zfi.m_args += "(";
+    for(size_t i=0; i<info.parameters.size(); ++i) {
+      const ClassInfo::ParameterInfo *param = info.parameters.at(i);
+      if ( param->attribute & ClassInfo::IsReference ) {
+        zfi.m_args += "&";
+      }
+      zfi.m_args += "$";
+      zfi.m_args += param->name;
+      zfi.m_args += ", ";
+    }
+    
+    if ( !info.parameters.empty() ) {
+      zfi.m_args.erase(zfi.m_args.length()-2, 2); // remove the ", " we added earlier
+    }
+    zfi.m_args += ")";
 
+    const Func* foo = ar->func();
+    if ( foo && foo->unit() && foo->unit()->filepath() ) {
+      zfi.m_filename = foo->unit()->filepath()->data();
+    }
+    zfi.m_name = getFunctionName(ar, funcType);
+  }
+  
   /**
    * @brief extract a Zend Server usable backtrace information from an extended exception class
    */
@@ -88,14 +125,27 @@ public:
     
     // Initialize Zend event reporting
     Zend::InitializeReporting();
-    ZendMonitor::setFatalErrorHandler( &monitorExtension::onFatalError );
-
+    
+    // Register our callbacks
+    ZendMonitor::setPfnFatalError   ( &monitorExtension::onFatalError    );
+    ZendMonitor::setPfnFunctionEnter( &monitorExtension::onFunctionEnter );
+    ZendMonitor::setPfnFunctionLeave( &monitorExtension::onFunctionLeave );
   }
+  
   virtual void requestInit() {
+    
     // Perform Request Init
+    m_collector.clear();
+    
+    // enable collection
+    m_collector.setCollecting(true);
+    
   }
+  
   virtual void requestShutdown() {
     Zend::SendEvents(g_vmContext->getRequestUrl(), "");
+    m_collector.dump();
+    m_collector.clear(); // will also stop collecting
   }
 
   /**
@@ -109,10 +159,37 @@ public:
       extractBacktraceFromExpcetion( *extExc, stackTrace );
     }
     Zend::ReportZendErrorEvent( Zend::kERROR, stackTrace, exc->getMessage());
+    
+    // Notify tracer
+    m_collector.onFatalError( exc->getMessage() );
+    
+    // Dump what we got so far
+    m_collector.dump();
+    
+    // disable collection until next r-init
+    m_collector.setCollecting(false);
+  }
+  
+  static void onFunctionEnter(const ActRec* ar, int funcType ) {
+    if ( m_collector.isCollecting() ) {
+      ZendFunctionInfo zfi;
+      getZendFunctionInfo(ar, funcType, zfi);
+      m_collector.enterFunction( zfi );
+    }
   }
 
+  static void onFunctionLeave(const ActRec* ar, int funcType ) {
+    if ( m_collector.isCollecting() ) {
+      ZendFunctionInfo zfi;
+      getZendFunctionInfo(ar, funcType, zfi);
+      m_collector.leaveFunction( zfi );
+    }
+  }
 
 } s_monitor_extension;
+
+// static initialization
+HPHP::ZendTraceCollector monitorExtension::m_collector;
 
 // Uncomment for non-bundled module
 HHVM_GET_MODULE(monitor);

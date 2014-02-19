@@ -3,7 +3,10 @@
 #include "hphp/runtime/ext/ext_error.h"
 #include "hphp/runtime/base/extended-logger.h"
 
-HPHP::ZendMonitor::PFUNC_ERROR_HANDLER HPHP::ZendMonitor::m_pfnFatalError = NULL;
+// static initialization
+HPHP::ZendMonitor::PFUNC_ERROR_HANDLER        HPHP::ZendMonitor::m_pfnFatalError = NULL;
+HPHP::ZendMonitor::PFUNC_FUNCTION_LEAVE_ENTER HPHP::ZendMonitor::m_pfnFunctionEnter = NULL;
+HPHP::ZendMonitor::PFUNC_FUNCTION_LEAVE_ENTER HPHP::ZendMonitor::m_pfnFunctionLeave = NULL;
 
 void HPHP::ZendMonitor::onFatalError(const HPHP::Exception* exc)
 {
@@ -13,7 +16,16 @@ void HPHP::ZendMonitor::onFatalError(const HPHP::Exception* exc)
   }
 }
 
-void HPHP::ZendMonitor::setFatalErrorHandler(PFUNC_ERROR_HANDLER pfn)
+void HPHP::ZendMonitor::onFunctionEnter(const HPHP::ActRec* ar, int funcType)
 {
-  m_pfnFatalError = pfn;
+  if ( m_pfnFunctionEnter ) {
+    m_pfnFunctionEnter(ar, funcType);
+  }
+}
+
+void HPHP::ZendMonitor::onFunctionExit(const HPHP::ActRec* ar, int funcType)
+{
+  if ( m_pfnFunctionLeave ) {
+    m_pfnFunctionLeave(ar, funcType);
+  }
 }
