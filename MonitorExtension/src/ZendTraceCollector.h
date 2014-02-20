@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <list>
+#include <map>
 
 namespace HPHP
 {
@@ -54,18 +55,20 @@ struct ZendFrame {
 class ZendTraceCollector
 {
 public:
-  typedef std::list<ZendFrame> FrameList_t;
+  typedef std::list<ZendFrame>       FrameList_t;
+  typedef std::map<std::string, int> MapTimes_t;
 
 protected:
   int         m_frame;
   FrameList_t m_frames;
   bool        m_collecting;
+  MapTimes_t  m_timesCalled;
 
 public:
   ZendTraceCollector();
   virtual ~ZendTraceCollector();
 
-  void dump();
+  void dump(std::ostream& os);
   void enterFunction(const ZendFunctionInfo& zfi);
   void leaveFunction(const ZendFunctionInfo& zfi);
   void clear();

@@ -19,6 +19,10 @@ void HPHP::ZendTraceCollector::enterFunction(const ZendFunctionInfo& zfi)
     ++m_frame;
     ZendFrame frame(zfi, m_frame);
     m_frames.push_back( frame );
+    if ( !m_timesCalled.count(zfi.m_name) ) {
+      m_timesCalled[zfi.m_name] = 0;
+    }
+    m_timesCalled[zfi.m_name]++;
   }
 }
 
@@ -30,23 +34,47 @@ void HPHP::ZendTraceCollector::leaveFunction(const ZendFunctionInfo& zfi)
   }
 }
 
-void HPHP::ZendTraceCollector::dump()
+void HPHP::ZendTraceCollector::dump(std::ostream& os)
 {
   if ( isCollecting() ) {
-    std::stringstream ss;
-    FrameList_t::const_iterator iter = m_frames.begin();
-    for(; iter != m_frames.end(); ++iter ) {
-      ss << std::setw(5) << iter->m_level << std::setw(0) << " | ";
-      for(int i=0; i<iter->m_level; ++i)
-        ss << "  ";
-      ss << iter->m_func.m_name << iter->m_func.m_args << " [ " << iter->m_func.m_filename << ", " << iter->m_func.m_linenumber <<  " ]\n";
+    //-----------------------------------
+    // Print global information
+    //-----------------------------------
+    os << ">>GLOBAL\n";
+    if ( g_vmContext->getTransport() ) {
+      Transport* transport = g_vmContext->getTransport();
+      os << "URL|" << transport->getUrl() << "\n";
+      os << "SERVER|" << transport->getServerAddr() << ":" << transport->getServerPort() << "\n";
     }
-    std::cout << ss.str() << std::endl;
+    os << "<<GLOBAL\n";
+    
+    //-----------------------------------
+    // Print callstack
+    //-----------------------------------
+    os << ">>CALLSTACK\n";
+    FrameList_t::const_iterator iter = m_frames.begin();
+    
+    for(; iter != m_frames.end(); ++iter ) {
+      os << std::setw(5) << iter->m_level << std::setw(0) << "|";
+      os << iter->m_func.m_name << iter->m_func.m_args << "|" << iter->m_func.m_filename << "|" << iter->m_func.m_linenumber <<  "\n";
+    }
+    os << "<<CALLSTACK\n";
+    
+    //-----------------------------------
+    // Print call statistics
+    //-----------------------------------
+    os << ">>CALLS\n";
+    MapTimes_t::iterator iterCalls = m_timesCalled.begin();
+    for(; iterCalls != m_timesCalled.end(); ++iterCalls ) {
+      os << iterCalls->first << "|" << iterCalls->second << "\n";
+    }
+    os << "<<CALLS\n";
   }
 }
 
 void HPHP::ZendTraceCollector::clear()
 {
+  m_timesCalled.clear();
   m_frames.clear();
   m_frame = -1;
   m_collecting = false;

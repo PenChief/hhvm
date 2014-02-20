@@ -6,6 +6,7 @@
 #include "ZendTraceCollector.h"
 #include "hphp/runtime/base/class-info.h"
 #include <iostream>
+#include <fstream>
 
 namespace HPHP
 {
@@ -144,7 +145,12 @@ public:
   
   virtual void requestShutdown() {
     Zend::SendEvents(g_vmContext->getRequestUrl(), "");
-    m_collector.dump();
+    
+    // print to file
+    std::ofstream file("/tmp/hhvm.trace", std::ios::trunc | std::ios::binary | std::ios::out );
+    m_collector.dump( file );
+    file.close();
+    
     m_collector.clear(); // will also stop collecting
   }
 
@@ -164,12 +170,17 @@ public:
     m_collector.onFatalError( exc->getMessage() );
     
     // Dump what we got so far
-    m_collector.dump();
-    
+    std::ofstream file("/tmp/hhvm.trace", std::ios::trunc | std::ios::binary | std::ios::out );
+    m_collector.dump( file );
+    file.close();
+        
     // disable collection until next r-init
     m_collector.setCollecting(false);
   }
   
+  /**
+   * @brief called by HHVM whenever a function is entered
+   */
   static void onFunctionEnter(const ActRec* ar, int funcType ) {
     if ( m_collector.isCollecting() ) {
       ZendFunctionInfo zfi;
@@ -178,6 +189,10 @@ public:
     }
   }
 
+  /**
+   * @brief called by HHVM whenever a function is exit
+   * Note that in some cases this handler might not get called (e.g. onFatalError)
+   */
   static void onFunctionLeave(const ActRec* ar, int funcType ) {
     if ( m_collector.isCollecting() ) {
       ZendFunctionInfo zfi;
